@@ -20,10 +20,13 @@ type Project = {
   category: Exclude<Category, "Toate">;
   desc: string;
   tags: string[];
-  cover?: string; // optional: "/images/portfolio/p1.jpg"
+  cover?: string;
   accent: "orange" | "cyan";
-};
 
+  demoUrl: string;
+  detailsUrl: string;
+  external?: boolean;
+};
 const Navbar = () => (
   <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/40 backdrop-blur-md">
     <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
@@ -58,9 +61,11 @@ const Navbar = () => (
         </a>
       </nav>
 
-      <Button className="bg-orange-500 hover:bg-orange-500/90 text-black rounded-xl px-5 h-10">
-        Cere ofertă
-      </Button>
+      <Link to="/oferta">
+        <Button className="bg-orange-500 hover:bg-orange-500/90 text-black rounded-xl px-5 h-10">
+          Cere ofertă
+        </Button>
+      </Link>
     </div>
   </header>
 );
@@ -94,6 +99,7 @@ function ProjectCard({ p }: { p: Project }) {
   const accent = p.accent === "orange" ? "bg-orange-500/14" : "bg-cyan-500/12";
   const ring =
     p.accent === "orange" ? "ring-orange-500/25" : "ring-cyan-500/20";
+
   const badge =
     p.category === "Landing"
       ? { icon: <Layout className="h-4 w-4" />, label: "Landing Page" }
@@ -104,9 +110,10 @@ function ProjectCard({ p }: { p: Project }) {
             label: "Magazin Online",
           };
 
+  const DemoLink = p.external ? "a" : Link;
+
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-6 hover:bg-white/[0.05] transition-colors">
-      {/* glow */}
       <div
         className={[
           "pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300",
@@ -114,7 +121,6 @@ function ProjectCard({ p }: { p: Project }) {
         ].join(" ")}
       />
 
-      {/* cover */}
       <div className="relative mb-6 overflow-hidden rounded-xl border border-white/10 bg-black/30">
         {p.cover ? (
           <img
@@ -141,13 +147,17 @@ function ProjectCard({ p }: { p: Project }) {
           {badge.label}
         </div>
 
-        <button
-          type="button"
+        {/* DEMO */}
+        <DemoLink
+          to={!p.external ? p.demoUrl : undefined}
+          href={p.external ? p.demoUrl : undefined}
+          target={p.external ? "_blank" : undefined}
+          rel={p.external ? "noreferrer" : undefined}
           className="inline-flex items-center gap-2 text-xs text-white/60 hover:text-white transition"
-          title="Demo (exemplu)"
+          title="Demo"
         >
           Demo <ExternalLink className="h-3.5 w-3.5" />
-        </button>
+        </DemoLink>
       </div>
 
       <h3 className="text-lg font-semibold text-white">{p.title}</h3>
@@ -164,12 +174,7 @@ function ProjectCard({ p }: { p: Project }) {
         ))}
       </div>
 
-      <div className="mt-6">
-        <div className="inline-flex w-full items-center justify-between rounded-xl bg-white/5 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10 transition">
-          Vezi detalii
-          <ArrowRight className="h-4 w-4" />
-        </div>
-      </div>
+      {/* VEZI DETALII */}
     </div>
   );
 }
@@ -181,52 +186,40 @@ export default function Portfolio() {
     () => [
       {
         id: "p1",
-        title: "Studio de Beauty – Landing",
-        category: "Landing",
+        title: "Cuptorul Dumitraș",
+        category: "Business",
         desc: "Landing page orientată pe conversii: servicii, rezultate, CTA clar și contact rapid.",
         tags: ["Mobile-first", "CTA", "SEO basic"],
         accent: "orange",
-        // cover: "/images/portfolio/beauty.jpg",
+        cover: "/images/portofolio/Cuptorul_Dumitras.png",
+        demoUrl: "https://cuptorul-dumitras-3k3z.vercel.app/",
+        detailsUrl: "/portofoliu/p1",
+        external: true,
       },
       {
         id: "p2",
-        title: "Firmă de Servicii – Website Business",
-        category: "Business",
-        desc: "Site business cu pagini clare, structură profesională, optimizare viteză și formulare.",
-        tags: ["3–6 pagini", "UX modern", "Performance"],
+        title: "Elaborare teze",
+        category: "Landing",
+        desc: "Site business cu pagină clară, structură profesională, optimizare viteză și formulare.",
+        tags: ["1 pagină", "UX modern", "Performance"],
         accent: "cyan",
+        cover: "/images/portofolio/teza.png",
+        demoUrl: "https://xn--tez-cpa.com/",
+        detailsUrl: "/portofoliu/p1",
+        external: true,
       },
       {
         id: "p3",
-        title: "Magazin Online – Produse Locale",
+        title: "Magazin Online – Ceasuri",
         category: "eCommerce",
         desc: "Catalog + categorii, pagini produs, coș și comandă. Layout curat și ușor de folosit.",
         tags: ["Catalog", "Checkout", "Admin (opțional)"],
         accent: "orange",
-      },
-      {
-        id: "p4",
-        title: "Creator / Freelancer – Portofoliu",
-        category: "Landing",
-        desc: "Pagini de prezentare cu focus pe proiecte, testimoniale și CTA către contact.",
-        tags: ["Portofoliu", "Branding", "Rapid"],
-        accent: "cyan",
-      },
-      {
-        id: "p5",
-        title: "Clinic – Website Business",
-        category: "Business",
-        desc: "Structură clară, pagini servicii, programări (link) și secțiuni pentru încredere.",
-        tags: ["Credibilitate", "Formular", "Structură"],
-        accent: "orange",
-      },
-      {
-        id: "p6",
-        title: "Shop – eCommerce Minimal",
-        category: "eCommerce",
-        desc: "Magazin modern, design premium, pagini de livrare/retur/FAQ și conversii bune.",
-        tags: ["eCommerce", "UX", "Pagini legale"],
-        accent: "cyan",
+        cover: "/images/portofolio/watch.png",
+        demoUrl:
+          "https://watch-bxuiw8z6z-trollers-projects-205cb586.vercel.app/",
+        detailsUrl: "/portofoliu/p1",
+        external: true,
       },
     ],
     [],
@@ -267,9 +260,11 @@ export default function Portfolio() {
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-              <Button className="bg-orange-500 hover:bg-orange-500/90 text-black rounded-xl px-7 h-11">
-                Cere ofertă →
-              </Button>
+              <Link to="/oferta">
+                <Button className="bg-orange-500 hover:bg-orange-500/90 text-black rounded-xl px-5 h-10">
+                  Cere ofertă
+                </Button>
+              </Link>
               <Link
                 to="/servicii"
                 className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-7 h-11 text-white/90 hover:bg-white/10 transition"
@@ -323,9 +318,11 @@ export default function Portfolio() {
                 </p>
               </div>
 
-              <Button className="bg-orange-500 hover:bg-orange-500/90 text-black rounded-xl px-8 h-11">
-                Trimite cererea →
-              </Button>
+              <Link to="/oferta">
+                <Button className="bg-orange-500 hover:bg-orange-500/90 text-black rounded-xl px-5 h-10">
+                  Cere ofertă
+                </Button>
+              </Link>
             </div>
           </section>
         </div>

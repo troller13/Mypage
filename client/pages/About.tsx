@@ -51,9 +51,11 @@ function Navbar() {
           <span className="text-white">Despre noi</span>
         </nav>
 
-        <Button className="bg-orange-500 hover:bg-orange-500/90 text-black rounded-xl px-5 h-10">
-          Cere ofertă
-        </Button>
+        <Link to="/oferta">
+          <Button className="bg-orange-500 hover:bg-orange-500/90 text-black rounded-xl px-5 h-10">
+            Cere ofertă
+          </Button>
+        </Link>
       </div>
     </header>
   );
@@ -143,11 +145,10 @@ export default function About() {
                 </Button>
               </Link>
 
-              <Link
-                to="/contact"
-                className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-7 h-11 text-white/90 hover:bg-white/10 transition"
-              >
-                Cere ofertă
+              <Link to="/oferta">
+                <Button className="bg-orange-500 hover:bg-orange-500/90 text-black rounded-xl px-5 h-10">
+                  Cere ofertă
+                </Button>
               </Link>
             </div>
           </div>

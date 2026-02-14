@@ -13,6 +13,8 @@ import Portfolio from "./pages/Portofolio";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
 import Multumesc from "./pages/Multumesc";
+import Oferta from "./pages/Oferta";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -28,6 +30,8 @@ const App = () => (
           <Route path="/Contact" element={<Contact />} />
           <Route path="/About" element={<About />} />
           <Route path="/multumesc" element={<Multumesc />} />
+          <Route path="/oferta" element={<Oferta />} />
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
