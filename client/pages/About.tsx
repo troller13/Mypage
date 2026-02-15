@@ -17,13 +17,12 @@ function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/40 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="grid h-9 w-9 place-items-center rounded-xl bg-white/5 ring-1 ring-white/10">
-            <span className="text-white font-semibold">W</span>
-          </div>
-          <span className="text-white/90 font-semibold tracking-tight">
-            Web Studio
-          </span>
+        <Link to="/" className="flex items-center">
+          <img
+            src="/images/logo_transparent.png"
+            alt="Logo"
+            className="h-12 w-auto"
+          />
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
@@ -311,7 +310,7 @@ export default function About() {
 
           {/* mini footer */}
           <div className="pb-8 text-center text-xs text-white/40">
-            © {new Date().getFullYear()} Web Studio • Toate drepturile rezervate
+            © {new Date().getFullYear()} NOVA WEB • Toate drepturile rezervate
           </div>
         </div>
       </section>

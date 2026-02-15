@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
+import emailjs from "@emailjs/browser";
 import {
   motion,
   useMotionValue,
@@ -59,6 +60,12 @@ export default function WebsiteRequestSection() {
   const [selected, setSelected] = useState<string>("Landing Page");
   const reduce = useReducedMotion();
   const sectionRef = useRef<HTMLElement | null>(null);
+
+  // form states
+  const formRef = useRef<HTMLFormElement | null>(null);
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
 
   const packages = useMemo<Package[]>(() => {
     if (mode === "business") {
@@ -172,6 +179,34 @@ export default function WebsiteRequestSection() {
     my.set(0);
   };
 
+  // ✅ submit email
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!formRef.current) return;
+
+    setSending(true);
+    setSent(false);
+    setErr(null);
+
+    try {
+      // IMPORTANT: pune PUBLIC KEY-ul tău aici
+      // Îl găsești în EmailJS: Account -> Public Key
+      await emailjs.sendForm(
+        "service_i77co7e",
+        "template_l2x5v2m",
+        formRef.current,
+        { publicKey: "k6Uzuao4KTBw0SnxL" },
+      );
+
+      setSent(true);
+      formRef.current.reset();
+    } catch (error) {
+      setErr("Nu s-a putut trimite cererea. Încearcă din nou.");
+    } finally {
+      setSending(false);
+    }
+  }
+
   return (
     <section
       ref={(el) => {
@@ -214,7 +249,7 @@ export default function WebsiteRequestSection() {
       </div>
 
       <div className="relative mx-auto max-w-6xl">
-        {/* HEADER (nu whileInView ca să nu se blocheze la toggle) */}
+        {/* HEADER */}
         <motion.div
           variants={headerV}
           initial="hidden"
@@ -238,7 +273,6 @@ export default function WebsiteRequestSection() {
               type="button"
               onClick={() => {
                 setMode("business");
-                // opțional: păstrează o selecție validă pe business
                 setSelected((prev) =>
                   prev === "Landing Page" ||
                   prev === "Website Business" ||
@@ -278,7 +312,7 @@ export default function WebsiteRequestSection() {
           </div>
         </motion.div>
 
-        {/* CARDS (key={mode} ca să re-ruleze animația când schimbi) */}
+        {/* CARDS */}
         <motion.div
           key={mode}
           variants={gridV}
@@ -299,16 +333,18 @@ export default function WebsiteRequestSection() {
                 whileTap={{ scale: 0.99 }}
                 className="relative text-left rounded-2xl focus:outline-none"
               >
-                {/* card body (păstrează border normal dacă nu e activ) */}
                 <div
                   className={`relative rounded-2xl border transition-all overflow-hidden ${
                     p.highlighted
                       ? "border-orange-500/60 bg-white/[0.04] md:scale-[1.04]"
                       : "border-white/10 bg-white/[0.03]"
-                  } ${isActive ? "ring-2 ring-orange-500/30" : "hover:border-orange-500/30"}`}
+                  } ${
+                    isActive
+                      ? "ring-2 ring-orange-500/30"
+                      : "hover:border-orange-500/30"
+                  }`}
                 >
                   <div className="p-8 h-full relative overflow-hidden">
-                    {/* accent glow în card */}
                     <motion.div
                       className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-orange-500/15 blur-3xl"
                       animate={
@@ -328,11 +364,12 @@ export default function WebsiteRequestSection() {
                       }}
                     />
 
-                    {/* header card */}
                     <div className="mb-6 relative z-10">
                       <div className="flex items-center justify-between mb-3">
                         <h3
-                          className={`text-xl font-semibold ${p.highlighted ? "text-orange-400" : "text-white"}`}
+                          className={`text-xl font-semibold ${
+                            p.highlighted ? "text-orange-400" : "text-white"
+                          }`}
                         >
                           {p.name}
                         </h3>
@@ -350,7 +387,6 @@ export default function WebsiteRequestSection() {
                       </div>
                     </div>
 
-                    {/* list */}
                     <div className="relative z-10">
                       <p className="text-xs font-semibold text-white/40 uppercase mb-4">
                         Ce includ
@@ -368,7 +404,6 @@ export default function WebsiteRequestSection() {
                       </ul>
                     </div>
 
-                    {/* CTA */}
                     <div className="mt-8 relative z-10">
                       <div
                         className={`inline-flex items-center justify-center w-full rounded-full px-5 py-3 text-sm font-semibold transition ${
@@ -387,13 +422,18 @@ export default function WebsiteRequestSection() {
           })}
         </motion.div>
 
-        {/* REQUEST FORM */}
-        <motion.div
+        {/* REQUEST FORM (EmailJS) */}
+        <motion.form
+          ref={formRef}
+          onSubmit={onSubmit}
           variants={headerV}
           initial="hidden"
           animate="show"
           className="mt-12 rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8"
         >
+          {/* trimitem tipul selectat */}
+          <input type="hidden" name="tip_selectat" value={safeSelected} />
+
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div>
               <div className="text-white font-semibold text-lg">
@@ -407,28 +447,53 @@ export default function WebsiteRequestSection() {
               </div>
             </div>
 
-            <Button className="rounded-full bg-orange-500 text-black hover:bg-orange-500/90 px-7 h-11">
-              Trimite cererea →
+            <Button
+              type="submit"
+              disabled={sending}
+              className="rounded-full bg-orange-500 text-black hover:bg-orange-500/90 px-7 h-11 disabled:opacity-70"
+            >
+              {sending ? "Se trimite..." : "Trimite cererea →"}
             </Button>
           </div>
 
           <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
             <input
+              name="nume_brand"
+              required
               className="h-11 rounded-xl bg-black/40 border border-white/10 px-4 text-white placeholder:text-white/30 outline-none focus:border-orange-500/50 transition"
               placeholder="Nume / Brand"
             />
             <input
+              name="instagram_website"
               className="h-11 rounded-xl bg-black/40 border border-white/10 px-4 text-white placeholder:text-white/30 outline-none focus:border-orange-500/50 transition"
               placeholder="Instagram / Website (dacă ai)"
             />
             <input
+              name="buget"
               className="h-11 rounded-xl bg-black/40 border border-white/10 px-4 text-white placeholder:text-white/30 outline-none focus:border-orange-500/50 transition"
               placeholder="Buget aproximativ (opțional)"
             />
           </div>
 
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              name="email"
+              type="email"
+              required
+              className="h-11 rounded-xl bg-black/40 border border-white/10 px-4 text-white placeholder:text-white/30 outline-none focus:border-orange-500/50 transition"
+              placeholder="Email"
+            />
+            <input
+              name="telefon"
+              className="h-11 rounded-xl bg-black/40 border border-white/10 px-4 text-white placeholder:text-white/30 outline-none focus:border-orange-500/50 transition"
+              placeholder="Telefon (opțional)"
+            />
+          </div>
+
           <div className="mt-4">
             <textarea
+              name="mesaj"
+              required
               className="min-h-[110px] w-full rounded-xl bg-black/40 border border-white/10 p-4 text-white placeholder:text-white/30 outline-none focus:border-orange-500/50 transition"
               placeholder="Descrie pe scurt: ce pagini vrei, exemple de site-uri care îți plac, ce vrei să apară pe site etc."
             />
@@ -438,7 +503,15 @@ export default function WebsiteRequestSection() {
             Răspund de obicei în 1–24h
             <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
           </div>
-        </motion.div>
+
+          {/* feedback */}
+          {sent && (
+            <div className="mt-4 text-sm text-green-400">
+              Cererea a fost trimisă cu succes ✅
+            </div>
+          )}
+          {err && <div className="mt-4 text-sm text-red-400">{err}</div>}
+        </motion.form>
       </div>
     </section>
   );

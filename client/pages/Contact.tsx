@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import emailjs from "@emailjs/browser";
 import {
   Mail,
   Phone,
@@ -16,13 +17,12 @@ function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/40 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="grid h-9 w-9 place-items-center rounded-xl bg-white/5 ring-1 ring-white/10">
-            <span className="text-white font-semibold">W</span>
-          </div>
-          <span className="text-white/90 font-semibold tracking-tight">
-            Web Studio
-          </span>
+        <Link to="/" className="flex items-center">
+          <img
+            src="/images/logo_transparent.png"
+            alt="Logo"
+            className="h-12 w-auto"
+          />
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
@@ -90,6 +90,53 @@ function InfoCard({
 }
 
 export default function Contact() {
+  const formRef = useRef<HTMLFormElement | null>(null);
+
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Controlled fields (ca să poți reseta ușor)
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [websiteType, setWebsiteType] = useState("");
+  const [message, setMessage] = useState("");
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!formRef.current) return;
+
+    setSending(true);
+    setError(null);
+
+    try {
+      await emailjs.sendForm(
+        "service_i77co7e",
+        "template_l2x5v2m",
+        formRef.current,
+        { publicKey: "k6Uzuao4KTBw0SnxL" },
+      );
+
+      setSent(true);
+      formRef.current.reset();
+
+      // reset state
+      setName("");
+      setEmail("");
+      setPhone("");
+      setWebsiteType("");
+      setMessage("");
+    } catch (err: any) {
+      console.log("EmailJS ERROR:", err?.status, err?.text, err);
+      setError(
+        err?.text ? `Eroare: ${err.text}` : "Nu s-a putut trimite. Reîncearcă.",
+      );
+    } finally {
+      setSending(false);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-black text-white">
       <Navbar />
@@ -182,56 +229,116 @@ export default function Contact() {
               <div className="mb-6">
                 <h2 className="text-2xl font-semibold">Trimite cererea</h2>
                 <p className="mt-2 text-white/60 text-sm">
-                  Completează câmpurile de mai jos. (Doar UI – fără API)
+                  Completează câmpurile de mai jos.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input
-                  className="h-11 rounded-xl bg-black/40 border border-white/10 px-4 text-white placeholder:text-white/30 outline-none focus:border-orange-500/50"
-                  placeholder="Nume / Brand"
-                />
-                <input
-                  className="h-11 rounded-xl bg-black/40 border border-white/10 px-4 text-white placeholder:text-white/30 outline-none focus:border-orange-500/50"
-                  placeholder="Email"
-                />
-                <input
-                  className="h-11 rounded-xl bg-black/40 border border-white/10 px-4 text-white placeholder:text-white/30 outline-none focus:border-orange-500/50"
-                  placeholder="Telefon (opțional)"
-                />
-                <input
-                  className="h-11 rounded-xl bg-black/40 border border-white/10 px-4 text-white placeholder:text-white/30 outline-none focus:border-orange-500/50"
-                  placeholder="Tip website (Landing / Business / Shop)"
-                />
-              </div>
+              {sent ? (
+                <div className="rounded-2xl border border-green-500/30 bg-green-500/10 p-5 text-green-200">
+                  Mesaj trimis ✅ Îți răspund în cel mai scurt timp.
+                  <div className="mt-4">
+                    <Button
+                      onClick={() => {
+                        setSent(false);
+                        setError(null);
+                      }}
+                      className="bg-white/10 hover:bg-white/15 text-white rounded-xl"
+                    >
+                      Trimite alt mesaj
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <form ref={formRef} onSubmit={onSubmit}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input
+                      name="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                      className="h-11 rounded-xl bg-black/40 border border-white/10 px-4 text-white placeholder:text-white/30 outline-none focus:border-orange-500/50"
+                      placeholder="Nume / Brand"
+                    />
+                    <input
+                      name="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="h-11 rounded-xl bg-black/40 border border-white/10 px-4 text-white placeholder:text-white/30 outline-none focus:border-orange-500/50"
+                      placeholder="Email"
+                    />
+                    <input
+                      name="phone"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="h-11 rounded-xl bg-black/40 border border-white/10 px-4 text-white placeholder:text-white/30 outline-none focus:border-orange-500/50"
+                      placeholder="Telefon (opțional)"
+                    />
+                    <input
+                      name="websiteType"
+                      value={websiteType}
+                      onChange={(e) => setWebsiteType(e.target.value)}
+                      required
+                      className="h-11 rounded-xl bg-black/40 border border-white/10 px-4 text-white placeholder:text-white/30 outline-none focus:border-orange-500/50"
+                      placeholder="Tip website (Landing / Business / Shop)"
+                    />
+                  </div>
 
-              <textarea
-                className="mt-4 min-h-[130px] w-full rounded-xl bg-black/40 border border-white/10 p-4 text-white placeholder:text-white/30 outline-none focus:border-orange-500/50"
-                placeholder="Descrie pe scurt ce vrei: pagini, funcții, exemple de site-uri care îți plac, deadline etc."
-              />
+                  <textarea
+                    name="message"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    required
+                    className="mt-4 min-h-[130px] w-full rounded-xl bg-black/40 border border-white/10 p-4 text-white placeholder:text-white/30 outline-none focus:border-orange-500/50"
+                    placeholder="Descrie pe scurt ce vrei: pagini, funcții, exemple de site-uri, deadline etc."
+                  />
 
-              <div className="mt-5 flex flex-col sm:flex-row gap-3">
-                <Button className="bg-orange-500 hover:bg-orange-500/90 text-black rounded-xl px-7 h-11">
-                  Trimite →
-                </Button>
+                  <div className="mt-5 flex flex-col sm:flex-row gap-3">
+                    <Button
+                      type="submit"
+                      disabled={sending}
+                      className="bg-orange-500 hover:bg-orange-500/90 text-black rounded-xl px-7 h-11 disabled:opacity-70"
+                    >
+                      {sending ? "Se trimite..." : "Trimite →"}
+                    </Button>
 
-                <a
-                  href="https://wa.me/069960179"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-7 h-11 text-white/90 hover:bg-white/10 transition"
-                >
-                  Scrie pe WhatsApp <ArrowRight className="h-4 w-4 ml-2" />
-                </a>
-              </div>
+                    <a
+                      href="https://wa.me/069960179"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-7 h-11 text-white/90 hover:bg-white/10 transition"
+                    >
+                      Scrie pe WhatsApp <ArrowRight className="h-4 w-4 ml-2" />
+                    </a>
+                  </div>
 
-              <div className="mt-4 text-xs text-white/45">
-                Sugestie: atașează 1–2 exemple de site-uri și spui ce îți place
-                la ele (culori, stil, structură).
-              </div>
+                  {error && (
+                    <div className="mt-4 text-xs text-red-400">{error}</div>
+                  )}
+
+                  <div className="mt-4 text-xs text-white/45">
+                    Sugestie: atașează 1–2 exemple de site-uri și spui ce îți
+                    place la ele (culori, stil, structură).
+                  </div>
+                </form>
+              )}
             </div>
 
-            {/* MAP / LOCATION */}
+            {/* MAP / LOCATION (placeholder) */}
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
+              <div className="mb-4 flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-orange-300" />
+                <h3 className="text-xl font-semibold">Locație</h3>
+              </div>
+              <p className="text-white/60 text-sm">
+                Lucrez remote (Moldova) – poți să-mi scrii oricând și stabilim
+                detaliile.
+              </p>
+              <div className="mt-6 rounded-2xl border border-white/10 bg-black/30 p-4 text-white/60 text-sm">
+                (opțional) Poți pune aici o hartă Google Maps embed.
+              </div>
+            </div>
           </div>
 
           {/* FOOTER CTA */}

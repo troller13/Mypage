@@ -54,7 +54,11 @@ export default function Hero() {
       <header className="fixed top-0 left-0 right-0 z-50  border-b border-border/10">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center">
-            <div className="text-2xl font-bold text-white">W</div>
+            <img
+              src="/images/logo_transparent.png"
+              alt="Logo"
+              className="h-12 w-auto"
+            />
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
@@ -150,16 +154,19 @@ export default function Hero() {
 
           {/* CTA */}
           <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button className="bg-orange-500 hover:bg-orange-500/90 text-white px-8 h-11 text-base rounded-lg">
+            <Link
+              to="/servicii"
+              className="bg-orange-500 hover:bg-orange-500/90 text-white px-8 h-11 text-base rounded-lg"
+            >
               Începe acum
-            </Button>
+            </Link>
 
-            <Button
-              variant="outline"
+            <Link
+              to="/about"
               className="border-white/25 text-white hover:bg-white/10 px-8 h-11 text-base rounded-lg"
             >
               Vezi detalii
-            </Button>
+            </Link>
           </div>
 
           {/* STATS (static) */}

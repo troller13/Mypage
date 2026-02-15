@@ -111,20 +111,6 @@ export default function WebsiteFaqSection() {
         </div>
 
         {/* ===== CTA FINAL (fără glow) ===== */}
-        <div className="relative mt-24 rounded-2xl border border-white/10 bg-white/[0.03] px-8 py-10 text-center">
-          <h3 className="text-white text-2xl md:text-3xl font-semibold mb-3">
-            Gata să începem site-ul tău?
-          </h3>
-
-          <p className="text-white/60 max-w-xl mx-auto mb-6 text-sm md:text-base">
-            Spune-mi ce tip de site ai nevoie și îți răspund cu o ofertă clară,
-            fără obligații.
-          </p>
-
-          <Button className="rounded-full bg-orange-500 text-black px-8 h-11 hover:bg-orange-500/90">
-            Cere ofertă →
-          </Button>
-        </div>
       </div>
     </section>
   );

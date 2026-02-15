@@ -1,4 +1,5 @@
 "use client";
+import { Link } from "react-router-dom";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -448,6 +449,7 @@ export default function StatsTimeline() {
           </div>
 
           {/* CTA */}
+
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -455,22 +457,21 @@ export default function StatsTimeline() {
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.25 }}
             className="mt-20 md:mt-24 flex flex-col items-center gap-4"
           >
-            <motion.button
+            <motion.div
               whileHover={{ y: -2, scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               transition={{ type: "spring", stiffness: 240, damping: 16 }}
-              className="group inline-flex items-center gap-3 rounded-full bg-orange-500 px-8 py-3 text-sm font-semibold text-black transition hover:bg-orange-500/90"
             >
-              Get Started
-              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-black/10 transition-transform group-hover:translate-x-0.5">
-                →
-              </span>
-            </motion.button>
-
-            <div className="flex items-center gap-2 text-xs text-white/45">
-              Slots are available
-              <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
-            </div>
+              <Link
+                to="/servicii"
+                className="group inline-flex items-center gap-3 rounded-full bg-orange-500 px-8 py-3 text-sm font-semibold text-black transition hover:bg-orange-500/90"
+              >
+                Cere acum
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-black/10 transition-transform group-hover:translate-x-0.5">
+                  →
+                </span>
+              </Link>
+            </motion.div>
           </motion.div>
         </div>
       </div>

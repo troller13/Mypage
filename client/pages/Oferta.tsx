@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, ArrowLeft, Sparkles } from "lucide-react";
+import emailjs from "@emailjs/browser";
 
 type FieldProps = {
   label: string;
@@ -45,7 +46,6 @@ function FloatingInput({
         ].join(" ")}
       />
 
-      {/* Label care NU dispare pe dark mode */}
       <label
         htmlFor={name}
         className={[
@@ -118,7 +118,11 @@ function FloatingSelect({
 }
 
 export default function Oferta() {
+  const formRef = useRef<HTMLFormElement | null>(null);
+
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -126,9 +130,41 @@ export default function Oferta() {
   const [budget, setBudget] = useState("");
   const [details, setDetails] = useState("");
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setSent(true);
+    if (!formRef.current) return;
+
+    setSending(true);
+    setError(null);
+
+    try {
+      // IMPORTANT: înlocuiește cu Public Key-ul tău din EmailJS (Account → Public Key)
+      await emailjs.sendForm(
+        "service_i77co7e",
+        "template_l2x5v2m",
+        formRef.current,
+        { publicKey: "k6Uzuao4KTBw0SnxL" },
+      );
+
+      setSent(true);
+      formRef.current.reset();
+
+      // reset state fields pentru floating labels
+      setName("");
+      setEmail("");
+      setProjectType("");
+      setBudget("");
+      setDetails("");
+    } catch (err: any) {
+      console.log("EmailJS ERROR:", err?.status, err?.text, err);
+      setError(
+        err?.text
+          ? `Eroare: ${err.text}`
+          : "Nu s-a putut trimite cererea. Încearcă din nou.",
+      );
+    } finally {
+      setSending(false);
+    }
   }
 
   const cardVariants = useMemo(
@@ -207,7 +243,10 @@ export default function Oferta() {
 
                   <div className="mt-6 flex flex-wrap gap-3">
                     <Button
-                      onClick={() => setSent(false)}
+                      onClick={() => {
+                        setSent(false);
+                        setError(null);
+                      }}
                       className="bg-white/10 hover:bg-white/15 text-white rounded-xl"
                     >
                       Trimite altă cerere
@@ -224,6 +263,7 @@ export default function Oferta() {
             </motion.div>
           ) : (
             <motion.form
+              ref={formRef}
               key="form"
               onSubmit={handleSubmit}
               initial={{ opacity: 0, y: 14 }}
@@ -346,10 +386,20 @@ export default function Oferta() {
                     whileTap={{ scale: 0.99 }}
                     transition={{ type: "spring", stiffness: 260, damping: 18 }}
                   >
-                    <Button className="w-full bg-orange-500 hover:bg-orange-500/90 text-black h-12 rounded-2xl">
-                      Trimite cererea →
+                    <Button
+                      type="submit"
+                      disabled={sending}
+                      className="w-full bg-orange-500 hover:bg-orange-500/90 text-black h-12 rounded-2xl disabled:opacity-70"
+                    >
+                      {sending ? "Se trimite..." : "Trimite cererea →"}
                     </Button>
                   </motion.div>
+
+                  {error && (
+                    <p className="mt-3 text-xs text-red-400 text-center">
+                      {error}
+                    </p>
+                  )}
 
                   <p className="mt-3 text-xs text-white/50 text-center">
                     Prin trimitere ești de acord să te contactăm pe email.
